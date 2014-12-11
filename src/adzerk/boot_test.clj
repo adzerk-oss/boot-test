@@ -3,11 +3,16 @@
   (:require [boot.pod  :as pod]
             [boot.core :as core]))
 
+(def pod-deps
+  '[[pjstadig/humane-test-output "0.6.0"]])
+
 (defn next-pod! [pool]
   (pool :refresh)
   (doto (pool)
     (pod/eval-in
-     (require '[clojure.test :as t])
+     (require '[clojure.test :as t]
+              '[pjstadig.humane-test-output :refer [activate!]])
+     (activate!)
      (defn test-ns* [pred ns]
        (binding [t/*report-counters* (ref t/*initial-report-counters*)]
          (let [ns-obj (the-ns ns)]
@@ -20,7 +25,7 @@
   "Run clojure.test tests in a pod."
   [n namespaces NAMESPACE #{sym} "Symbols of the namespaces to run tests in."
    f filters EXPR #{any} "Clojure expressions that are evaluated with % bound to a Var in a namespace under test. All must evaluate to true for a Var to be considered for testing by clojure.test/test-vars."]
-  (let [worker-pods (pod/pod-pool 2 (core/get-env))]
+  (let [worker-pods (pod/pod-pool 2 (update-in (core/get-env) [:dependencies] into pod-deps))]
     (core/cleanup (worker-pods :shutdown))
     (core/with-pre-wrap
       (if (seq namespaces)
