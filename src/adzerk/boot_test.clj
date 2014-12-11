@@ -27,11 +27,11 @@
         (let [pod (next-pod! worker-pods)
               filterf `(~'fn [~'%] (and ~@filters))
               summary (pod/eval-in pod
-                                   (doseq [ns '~namespaces] (require ns))
-                                   (let [ns-results (map (partial test-ns* ~filterf) '~namespaces)]
-                                     (-> (reduce (partial merge-with +) ns-results)
-                                         (assoc :type :summary)
-                                         (doto t/do-report))))]
+                        (doseq [ns '~namespaces] (require ns))
+                        (let [ns-results (map (partial test-ns* ~filterf) '~namespaces)]
+                          (-> (reduce (partial merge-with +) ns-results)
+                              (assoc :type :summary)
+                              (doto t/do-report))))]
           (when (> (apply + (map summary [:fail :error])) 0)
             (throw (ex-info "Some tests failed or errored" summary))))
         (println "No namespaces were tested.")))))
