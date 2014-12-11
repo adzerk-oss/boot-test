@@ -4,7 +4,7 @@
             [boot.core :as core]))
 
 (def pod-deps
-  '[[pjstadig/humane-test-output "0.6.0"]])
+  '[[pjstadig/humane-test-output "0.6.0" :exclusions [org.clojure/clojure]]])
 
 (defn next-pod! [pool]
   (pool :refresh)
