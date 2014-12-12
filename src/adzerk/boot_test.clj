@@ -1,5 +1,6 @@
 (ns adzerk.boot-test
   {:boot/export-tasks true}
+  (:refer-clojure :exclude [test])
   (:require [boot.pod  :as pod]
             [boot.core :as core]))
 
@@ -21,7 +22,7 @@
            (t/do-report {:type :end-test-ns :ns ns-obj}))
          @t/*report-counters*)))))
 
-(core/deftask tests
+(core/deftask test
   "Run clojure.test tests in a pod."
   [n namespaces NAMESPACE #{sym} "Symbols of the namespaces to run tests in."
    f filters EXPR #{any} "Clojure expressions that are evaluated with % bound to a Var in a namespace under test. All must evaluate to true for a Var to be considered for testing by clojure.test/test-vars."]

@@ -11,7 +11,7 @@ namespace:
 
 ```clj
 (set-env! :dependencies '[[adzerk/boot-test "X.Y.Z" :scope "test"]])
-(require '[adzerk.boot-test :refer [tests]])
+(require '[adzerk.boot-test :refer :all])
 ```
 
 If your tests are in a directory that is not included in the classpath, you will need to add it
@@ -23,24 +23,24 @@ If your tests are in a directory that is not included in the classpath, you will
 You can see the options available on the command line:
 
 ```bash
-$ boot tests -h
+$ boot test -h
 ```
 
 or in the REPL:
 
 ```clj
-boot.user=> (doc tests)
+boot.user=> (doc test)
 ```
 
 ## Continuous Testing
 
 Whisper some magic incantations to boot, and it will run tests every time you save a file
 ```
-boot watch tests
+boot watch test
 ```
 with sound!
 ```
-boot watch speak tests
+boot watch speak test
 ```
 
 ## License
