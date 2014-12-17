@@ -31,7 +31,7 @@
   "Run clojure.test tests in a pod."
   [n namespaces NAMESPACE #{sym} "Symbols of the namespaces to run tests in."
    f filters EXPR #{any} "Clojure expressions that are evaluated with % bound to a Var in a namespace under test. All must evaluate to true for a Var to be considered for testing by clojure.test/test-vars."]
-  (let [worker-pods (pod/pod-pool (assoc-in (core/get-env) [:dependencies] pod-deps) :init init)]
+  (let [worker-pods (pod/pod-pool (update-in (core/get-env) [:dependencies] into pod-deps) :init init)]
     (core/cleanup (worker-pods :shutdown))
     (core/with-pre-wrap fileset
       (if (seq namespaces)
