@@ -17,7 +17,7 @@ namespace:
 If your tests are in a directory that is not included in the classpath, you will need to add it
 
 ```
-(set-env! :src-paths #{"test"})
+(set-env! :source-paths #{"test"})
 ```
 
 You can see the options available on the command line:
