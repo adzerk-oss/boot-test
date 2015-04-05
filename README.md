@@ -53,5 +53,5 @@ your option) any later version.
 [1]: http://clojars.org/adzerk/boot-test/latest-version.svg?cache=5
 [2]: http://clojars.org/adzerk/boot-test
 [Boot]: https://github.com/boot-clj/boot
-[badge]: https://travis-ci.org/adzerk/boot-test.png?branch=master
-[build]: https://travis-ci.org/adzerk/boot-test
+[badge]: https://travis-ci.org/adzerk-oss/boot-test.png?branch=master
+[build]: https://travis-ci.org/adzerk-oss/boot-test
