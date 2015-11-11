@@ -1,8 +1,12 @@
 # boot-test [![Build Status][badge]][build]
 
-[![Clojars Project][1]][2]
-
 [Boot] task for running clojure.test tests
+
+[](dependency)
+```clojure
+[adzerk/boot-test "1.0.5"] ;; latest release
+```
+[](/dependency)
 
 ## Usage
 
