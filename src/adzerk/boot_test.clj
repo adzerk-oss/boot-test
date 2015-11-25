@@ -4,11 +4,12 @@
   (:require [boot.pod  :as pod]
             [boot.core :as core]))
 
-(def pod-deps
+(def base-pod-deps
   '[[org.clojure/tools.namespace "0.2.11" :exclusions [org.clojure/clojure]]
     [pjstadig/humane-test-output "0.6.0"  :exclusions [org.clojure/clojure]]])
 
-(defn init [fresh-pod]
+(defn init [requires fresh-pod]
+  (dorun (map (partial pod/require-in fresh-pod) requires))
   (doto fresh-pod
     (pod/with-eval-in
      (require '[clojure.test :as t]
@@ -43,9 +44,11 @@
   to be considered for testing by clojure.test/test-vars."
 
   [n namespaces NAMESPACE #{sym} "The set of namespace symbols to run tests in."
-   f filters    EXPR      #{edn} "The set of expressions to use to filter namespaces."]
+   f filters    EXPR      #{edn} "The set of expressions to use to filter namespaces."
+   r requires   REQUIRES  #{sym} "Extra namespaces to pre-load into the pool of test pods for speed."]
 
-  (let [worker-pods (pod/pod-pool (update-in (core/get-env) [:dependencies] into pod-deps) :init init)]
+  (let [pod-deps (update-in (core/get-env) [:dependencies] into base-pod-deps)
+        worker-pods (pod/pod-pool pod-deps :init (partial init requires))]
     (core/cleanup (worker-pods :shutdown))
     (core/with-pre-wrap fileset
       (let [worker-pod (worker-pods :refresh)
