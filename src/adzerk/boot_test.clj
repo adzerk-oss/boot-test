@@ -39,11 +39,14 @@
   The --namespaces option specifies the namespaces to test. The default is to
   run tests in all namespaces found in the project.
 
+  The --exclusions option specifies the namespaces to exclude from testing.
+
   The --filters option specifies Clojure expressions that are evaluated with %
   bound to a Var in a namespace under test. All must evaluate to true for a Var
   to be considered for testing by clojure.test/test-vars."
 
   [n namespaces NAMESPACE #{sym} "The set of namespace symbols to run tests in."
+   e exclusions NAMESPACE #{sym} "The set of namespace symbols to be excluded from test."
    f filters    EXPR      #{edn} "The set of expressions to use to filter namespaces."
    r requires   REQUIRES  #{sym} "Extra namespaces to pre-load into the pool of test pods for speed."]
 
@@ -56,7 +59,8 @@
                            (pod/with-eval-in worker-pod
                              (all-ns* ~@(->> fileset
                                              core/input-dirs
-                                             (map (memfn getPath))))))]
+                                             (map (memfn getPath))))))
+            namespaces (remove (or exclusions #{}) namespaces)]
         (if (seq namespaces)
           (let [filterf `(~'fn [~'%] (and ~@filters))
                 summary (pod/with-eval-in worker-pod
