@@ -18,7 +18,7 @@
               '[clojure.tools.namespace.find :refer [find-namespaces-in-dir]])
      (activate!)
      (defn all-ns* [& dirs]
-       (mapcat #(find-namespaces-in-dir (io/file %)) dirs))
+       (distinct (mapcat #(find-namespaces-in-dir (io/file %)) dirs)))
      (defn test-ns* [pred ns]
        (binding [t/*report-counters* (ref t/*initial-report-counters*)]
          (let [ns-obj (the-ns ns)]
