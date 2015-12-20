@@ -4,7 +4,7 @@
 
 [](dependency)
 ```clojure
-[adzerk/boot-test "1.0.6"] ;; latest release
+[adzerk/boot-test "1.0.7"] ;; latest release
 ```
 [](/dependency)
 
