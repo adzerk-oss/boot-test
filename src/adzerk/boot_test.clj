@@ -101,13 +101,10 @@
                           (let [ns-results (map (partial test-ns* ~filterf ~junit-output-to) '~namespaces)]
                             (-> (reduce (partial merge-with +) ns-results)
                                 (assoc :type :summary)
-                                (doto t/do-report))))
-                summary-out-filename "clojure.test.result.edn"]
-            (spit (clojure.java.io/file tmp summary-out-filename)
-                  (pr-str summary))
+                                (doto t/do-report))))]
             (-> fileset
+                (vary-meta assoc :clojure.test/result summary)
                 (core/add-asset tmp)
-                (core/add-meta {summary-out-filename {:clojure.test/result summary}})
                 core/commit!))
           (do
             (println "No namespaces were tested.")
@@ -145,11 +142,7 @@
       identity)
     (core/with-pre-wrap
       fileset
-      (let [summary (->> fileset
-                         core/output-files
-                         (core/by-name ["clojure.test.result.edn"])
-                         first
-                         :clojure.test/result)]
+      (let [summary (:clojure.test/result (meta fileset))]
         (if (> (apply + (map summary [:fail :error])) 0)
           (throw (ex-info "Some tests failed or errored" summary))
           fileset)))))
