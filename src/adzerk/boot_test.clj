@@ -33,7 +33,7 @@
 (if ((loaded-libs) 'boot.user)
   (ns-unmap 'boot.user 'test))
 
-(core/deftask test
+(core/deftask run-tests
   "Run clojure.test tests in a pod.
 
   The --namespaces option specifies the namespaces to test. The default is to
@@ -63,13 +63,51 @@
             namespaces (remove (or exclusions #{}) namespaces)]
         (if (seq namespaces)
           (let [filterf `(~'fn [~'%] (and ~@filters))
+                tmp (core/tmp-dir!)
                 summary (pod/with-eval-in worker-pod
                           (doseq [ns '~namespaces] (require ns))
                           (let [ns-results (map (partial test-ns* ~filterf) '~namespaces)]
                             (-> (reduce (partial merge-with +) ns-results)
                                 (assoc :type :summary)
-                                (doto t/do-report))))]
-            (when (> (apply + (map summary [:fail :error])) 0)
-              (throw (ex-info "Some tests failed or errored" summary))))
-          (println "No namespaces were tested."))
-        fileset))))
+                                (doto t/do-report))))
+                summary-out-filename "clojure.test.result.edn"]
+            (spit (clojure.java.io/file tmp summary-out-filename)
+                  (pr-str summary))
+            (-> fileset
+                (core/add-asset tmp)
+                (core/add-meta {summary-out-filename {:clojure.test/result summary}})
+                core/commit!))
+          (do
+            (println "No namespaces were tested.")
+            fileset))))))
+
+(core/deftask test
+  "Run clojure.test tests in a pod. Throws on test errors or failures.
+
+  The --namespaces option specifies the namespaces to test. The default is to
+  run tests in all namespaces found in the project.
+
+  The --exclusions option specifies the namespaces to exclude from testing.
+
+  The --filters option specifies Clojure expressions that are evaluated with %
+  bound to a Var in a namespace under test. All must evaluate to true for a Var
+  to be considered for testing by clojure.test/test-vars."
+  [n namespaces NAMESPACE #{sym} "The set of namespace symbols to run tests in."
+   e exclusions NAMESPACE #{sym} "The set of namespace symbols to be excluded from test."
+   f filters    EXPR      #{edn} "The set of expressions to use to filter namespaces."
+   r requires   REQUIRES  #{sym} "Extra namespaces to pre-load into the pool of test pods for speed."]
+  (comp
+    (run-tests :namespaces namespaces
+               :exclusions exclusions
+               :filters filters
+               :requires requires)
+    (core/with-pre-wrap
+      fileset
+      (let [summary (->> fileset
+                         core/output-files
+                         (core/by-name ["clojure.test.result.edn"])
+                         first
+                         :clojure.test/result)]
+        (if (> (apply + (map summary [:fail :error])) 0)
+          (throw (ex-info "Some tests failed or errored" summary))
+          fileset)))))
