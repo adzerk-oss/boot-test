@@ -25,7 +25,11 @@
 
      (defn junit-plus-default-report [old-report junit-out m]
        (old-report m)
-       (binding [t/*test-out* junit-out]
+       (binding [t/*test-out* junit-out
+                 ;; junit will inc the counters, but old-report is already doing that
+                 ;; so we pass a new counters ref that will be discarded to avoid
+                 ;; duplicate counters
+                 t/*report-counters* (ref {})]
          (junit/junit-report m)))
 
      (defn run-tests-with-junit-reporter [run-tests-fn output-to]
