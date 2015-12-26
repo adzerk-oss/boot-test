@@ -17,4 +17,5 @@
        :scm         {:url "https://github.com/adzerk/boot-test"}
        :license     {"Eclipse Public License"
                      "http://www.eclipse.org/legal/epl-v10.html"}}
- test {:namespaces '#{adzerk.boot-test.test}})
+ test {:namespaces '#{adzerk.boot-test.test}
+       :junit-output-to "junit-out"})
