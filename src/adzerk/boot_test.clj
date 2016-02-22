@@ -110,9 +110,10 @@
                 (vary-meta assoc :clojure.test/result summary)
                 (core/add-asset tmp)
                 core/commit!))
-          (do
+          (let [summary {:test 0, :pass 0, :fail 0, :error 0}] ; from clojure.test/*initial-report-counters*
             (println "No namespaces were tested.")
-            fileset))))))
+            (-> fileset
+                (vary-meta assoc :clojure.test/result summary))))))))
 
 (core/deftask test
   "Run clojure.test tests in a pod. Throws on test errors or failures.
